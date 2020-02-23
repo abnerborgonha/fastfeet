@@ -1,7 +1,23 @@
 import * as Yup from 'yup';
 import Deliveryman from '../models/Deliveryman';
+import File from '../models/File';
 
 class DeliverymanController {
+  async index(req, res) {
+    const deliverymans = await Deliveryman.findAll({
+      attributes: ['id', 'name', 'email', 'avatar_id'],
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['name', 'path', 'url'],
+        },
+      ],
+    });
+
+    return res.json(deliverymans);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
@@ -20,6 +36,14 @@ class DeliverymanController {
     const { id, name, email } = await Deliveryman.create(deliveryman);
 
     return res.json({ id, name, email });
+  }
+
+  async update(req, res) {
+    return res.json({ ok: true });
+  }
+
+  async delete(req, res) {
+    return res.json({ ok: true });
   }
 }
 
