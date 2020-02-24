@@ -39,11 +39,44 @@ class DeliverymanController {
   }
 
   async update(req, res) {
-    return res.json({ ok: true });
+    const schema = Yup.object().shape({
+      name: Yup.string(),
+      email: Yup.string().email(),
+      avatar_id: Yup.number(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    const deliveryman = await Deliveryman.findByPk(req.params.id, {
+      attributes: ['id', 'name', 'email', 'avatar_id'],
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['name', 'path', 'url'],
+        },
+      ],
+    });
+
+    if (!deliveryman) {
+      return res.status(400).json({ error: 'Deliveryman not found' });
+    }
+
+    const { id, name, email, avatar_id, avatar } = await deliveryman.update(
+      req.body
+    );
+
+    return res.json({ id, name, email, avatar_id, avatar });
   }
 
   async delete(req, res) {
-    return res.json({ ok: true });
+    const deliveryman = await Deliveryman.findByPk(req.params.id);
+
+    await deliveryman.destroy();
+
+    return res.json();
   }
 }
 
