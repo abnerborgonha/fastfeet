@@ -21,7 +21,11 @@ routes.post('/sessions', SessionController.store);
 routes.get('/delivery/:id/pendencies', DeliveryController.indexPendencies);
 routes.get('/delivery/:id/deliveries', DeliveryController.indexDeliveries);
 routes.put('/delivery/:id/start', DeliveryController.updateStart);
-routes.put('/delivery/:id/end', DeliveryController.updateEnd);
+routes.put(
+  '/delivery/:id/end',
+  upload.single('file'),
+  DeliveryController.updateEnd
+);
 
 routes.use(authMiddleware);
 

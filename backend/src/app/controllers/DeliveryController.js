@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import { parseISO, isAfter, isBefore, setHours } from 'date-fns';
 import Order from '../models/Order';
 import Recipient from '../models/Recipient';
+import File from '../models/File';
 
 class DeliveryController {
   async indexPendencies(req, res) {
@@ -137,13 +138,12 @@ class DeliveryController {
   }
 
   async updateEnd(req, res) {
-    const schema = Yup.object().shape({
-      signature_id: Yup.number().required(),
-    });
+    const { originalname: name, filename: path } = req.file;
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
+    const { id: signature_id } = await File.create({
+      name,
+      path,
+    });
 
     const end_date = new Date();
 
@@ -166,10 +166,9 @@ class DeliveryController {
       id,
       recipient_id,
       deliveryman_id,
-      signature_id,
       start_date,
       product,
-    } = await delivery.update({ ...req.body, end_date });
+    } = await delivery.update({ ...req.body, signature_id, end_date });
 
     return res.json({
       id,
