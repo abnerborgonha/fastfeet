@@ -24,7 +24,6 @@ class DeliverymanController {
       email: Yup.string()
         .email()
         .required(),
-      avatar_id: Yup.number(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -51,24 +50,15 @@ class DeliverymanController {
 
     const deliveryman = await Deliveryman.findByPk(req.params.id, {
       attributes: ['id', 'name', 'email', 'avatar_id'],
-      include: [
-        {
-          model: File,
-          as: 'avatar',
-          attributes: ['name', 'path', 'url'],
-        },
-      ],
     });
 
     if (!deliveryman) {
       return res.status(400).json({ error: 'Deliveryman not found' });
     }
 
-    const { id, name, email, avatar_id, avatar } = await deliveryman.update(
-      req.body
-    );
+    const { id, name, email, avatar_id } = await deliveryman.update(req.body);
 
-    return res.json({ id, name, email, avatar_id, avatar });
+    return res.json({ id, name, email, avatar_id });
   }
 
   async delete(req, res) {
