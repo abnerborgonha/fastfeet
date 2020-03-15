@@ -30,6 +30,10 @@ class Order extends Model {
       foreignKey: 'signature_id',
       as: 'signature',
     });
+    this.hasMany(models.DeliveryProblem, {
+      foreignKey: 'order_id',
+      as: 'problems',
+    });
   }
 }
 
