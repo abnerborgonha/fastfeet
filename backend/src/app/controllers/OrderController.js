@@ -4,6 +4,8 @@ import Recipient from '../models/Recipient';
 import Deliveryman from '../models/Deliveryman';
 import Order from '../models/Order';
 
+import Mail from '../../lib/Mail';
+
 class OrderController {
   async index(req, res) {
     const orders = await Order.findAll({
@@ -68,15 +70,15 @@ class OrderController {
 
     const { recipient_id, deliveryman_id, product } = req.body;
 
-    const recipientExist = await Recipient.findByPk(recipient_id);
+    const recipient = await Recipient.findByPk(recipient_id);
 
-    if (!recipientExist) {
+    if (!recipient) {
       return res.status(401).json({ error: 'Recipient not exists' });
     }
 
-    const deliverymanExist = await Deliveryman.findByPk(deliveryman_id);
+    const deliveryman = await Deliveryman.findByPk(deliveryman_id);
 
-    if (!deliverymanExist) {
+    if (!deliveryman) {
       return res.status(401).json({ error: 'Deliveryman not exists' });
     }
 
@@ -84,6 +86,30 @@ class OrderController {
       recipient_id,
       deliveryman_id,
       product,
+    });
+
+    await Mail.sendMail({
+      to: `${deliveryman.name} <${deliveryman.email}>`,
+      subject: 'Entrega cancelada',
+      template: 'cancelation',
+      context: {
+        deliveryman: deliveryman.name,
+        product: order.product,
+        name: recipient.name,
+        state: recipient.state,
+        city: recipient.city,
+        neighborhood: recipient.neighborhood,
+        street: recipient.street,
+        street_number: recipient.street_number,
+        complement: recipient.complement,
+        zip_code: recipient.zip_code,
+      },
+    });
+
+    await Mail.sendMail({
+      to: `${deliveryman.name} <${deliveryman.email}>`,
+      subject: 'Nova Entrega',
+      text: 'Você tem uma nova Entrega',
     });
 
     return res.json(order);

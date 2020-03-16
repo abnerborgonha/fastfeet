@@ -1,6 +1,12 @@
 import * as Yup from 'yup';
+import { format } from 'date-fns';
+import { pt } from 'date-fns/locale';
 import DeliveryProblem from '../models/DeliveryProblem';
+import Deliveryman from '../models/Deliveryman';
+import Recipient from '../models/Recipient';
 import Order from '../models/Order';
+
+import Mail from '../../lib/Mail';
 
 class DeliveryProblemsController {
   async index(req, res) {
@@ -63,13 +69,40 @@ class DeliveryProblemsController {
       return res.status(400).json({ error: 'Problem not found' });
     }
 
-    const order = await Order.findByPk(problem.order_id);
+    const order = await Order.findByPk(problem.order_id, {
+      include: [
+        {
+          model: Deliveryman,
+          as: 'deliveryman',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: Recipient,
+          as: 'recipient',
+          attributes: ['name'],
+        },
+      ],
+    });
 
-    const canceled_at = new Date();
+    order.canceled_at = new Date();
 
-    await order.update({ canceled_at });
+    await order.save();
 
-    return res.json();
+    await Mail.sendMail({
+      to: `${order.deliveryman.name} <${order.deliveryman.email}>`,
+      subject: 'Entrega cancelada',
+      template: 'cancelation',
+      context: {
+        deliveryman: order.deliveryman.name,
+        recipient: order.recipient.name,
+        product: order.product,
+        date: format(order.start_date, "'dia' dd 'de' MMMM, às' H:mm:h'", {
+          locale: pt,
+        }),
+      },
+    });
+
+    return res.json(order);
   }
 }
 
