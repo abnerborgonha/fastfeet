@@ -90,8 +90,8 @@ class OrderController {
 
     await Mail.sendMail({
       to: `${deliveryman.name} <${deliveryman.email}>`,
-      subject: 'Entrega cancelada',
-      template: 'cancelation',
+      subject: 'Você tem uma nova entrega',
+      template: 'newDelivery',
       context: {
         deliveryman: deliveryman.name,
         product: order.product,
@@ -104,12 +104,6 @@ class OrderController {
         complement: recipient.complement,
         zip_code: recipient.zip_code,
       },
-    });
-
-    await Mail.sendMail({
-      to: `${deliveryman.name} <${deliveryman.email}>`,
-      subject: 'Nova Entrega',
-      text: 'Você tem uma nova Entrega',
     });
 
     return res.json(order);

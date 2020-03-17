@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { format } from 'date-fns';
+import { Op } from 'sequelize';
 import { pt } from 'date-fns/locale';
 import DeliveryProblem from '../models/DeliveryProblem';
 import Deliveryman from '../models/Deliveryman';
@@ -13,6 +14,7 @@ class DeliveryProblemsController {
     const problems = await Order.findAll({
       include: [
         {
+          where: { [Op.not]: { description: null } },
           attributes: ['id', 'description'],
           association: 'problems',
         },
@@ -91,18 +93,18 @@ class DeliveryProblemsController {
     await Mail.sendMail({
       to: `${order.deliveryman.name} <${order.deliveryman.email}>`,
       subject: 'Entrega cancelada',
-      template: 'cancelation',
+      template: 'cancellation',
       context: {
         deliveryman: order.deliveryman.name,
         recipient: order.recipient.name,
         product: order.product,
-        date: format(order.start_date, "'dia' dd 'de' MMMM, às' H:mm:h'", {
+        date: format(order.start_date, "'dia' dd 'de' MMMM, 'às' HH:mm'h'", {
           locale: pt,
         }),
       },
     });
 
-    return res.json(order);
+    return res.json(problem);
   }
 }
 
