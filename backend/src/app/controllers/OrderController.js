@@ -88,7 +88,7 @@ class OrderController {
       product,
     });
 
-    await Mail.sendMail({
+    Mail.sendMail({
       to: `${deliveryman.name} <${deliveryman.email}>`,
       subject: 'Você tem uma nova entrega',
       template: 'newDelivery',

@@ -1,13 +1,12 @@
 import * as Yup from 'yup';
-import { format } from 'date-fns';
 import { Op } from 'sequelize';
-import { pt } from 'date-fns/locale';
 import DeliveryProblem from '../models/DeliveryProblem';
 import Deliveryman from '../models/Deliveryman';
 import Recipient from '../models/Recipient';
 import Order from '../models/Order';
 
-import Mail from '../../lib/Mail';
+import CancellationMail from '../jobs/CancellationMail';
+import Queue from '../../lib/Queue';
 
 class DeliveryProblemsController {
   async index(req, res) {
@@ -90,18 +89,8 @@ class DeliveryProblemsController {
 
     await order.save();
 
-    await Mail.sendMail({
-      to: `${order.deliveryman.name} <${order.deliveryman.email}>`,
-      subject: 'Entrega cancelada',
-      template: 'cancellation',
-      context: {
-        deliveryman: order.deliveryman.name,
-        recipient: order.recipient.name,
-        product: order.product,
-        date: format(order.start_date, "'dia' dd 'de' MMMM, 'às' HH:mm'h'", {
-          locale: pt,
-        }),
-      },
+    await Queue.add(CancellationMail.key, {
+      order,
     });
 
     return res.json(problem);
