@@ -19,7 +19,14 @@ export default function Order() {
     async function loadOrders() {
       const response = await api.get('orders');
 
-      setOrders(response.data);
+      const data = response.data.map(order => ({
+        ...order,
+        status: order.canceled_at
+          ? 'CANCELADO'
+          : [order.end_date ? 'ENTREGUE' : 'PENDENTE'],
+      }));
+
+      setOrders(data);
     }
 
     loadOrders();
@@ -62,13 +69,7 @@ export default function Order() {
               <td>{order.deliveryman.name}</td>
               <td>{order.recipient.city}</td>
               <td>{order.recipient.state}</td>
-              <td>
-                {order.canceled_at
-                  ? 'CANCELADO'
-                  : order.end_date
-                  ? 'ENTREGUE'
-                  : 'PENDENTE'}
-              </td>
+              <td>{order.status}</td>
               <td>
                 <Modal>
                   <button type="button">
