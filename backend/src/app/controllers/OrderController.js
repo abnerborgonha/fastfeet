@@ -9,10 +9,15 @@ import Mail from '../../lib/Mail';
 
 class OrderController {
   async index(req, res) {
-    const { q: name = '%' } = req.query;
+    let { q: name = '%' } = req.query;
+
+    if (name === '') {
+      name = '%';
+    }
 
     const orders = await Order.findAll({
       where: { product: { [Op.like]: name } },
+      order: [['id', 'ASC']],
       attributes: [
         'id',
         'product',
@@ -22,6 +27,7 @@ class OrderController {
         'recipient_id',
         'deliveryman_id',
         'signature_id',
+        'status',
       ],
       include: [
         {
