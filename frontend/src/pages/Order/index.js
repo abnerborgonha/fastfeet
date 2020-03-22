@@ -7,6 +7,8 @@ import {
   MdVisibility,
 } from 'react-icons/md';
 import { toast } from 'react-toastify';
+import { format, parseISO } from 'date-fns';
+import pt from 'date-fns/locale/pt';
 import Modal from '~/components/Modal';
 import history from '~/services/history';
 
@@ -25,7 +27,21 @@ export default function Order() {
   async function loadOrders(productName) {
     const response = await api.get(`/orders?q=${productName}`);
 
-    setOrders(response.data);
+    const data = response.data.map(order => ({
+      ...order,
+      start_date_formatted: order.start_date
+        ? format(parseISO(order.start_date), 'dd/MM/yyyy', {
+            locale: pt,
+          })
+        : null,
+      end_date_formatted: order.end_date
+        ? format(parseISO(order.end_date), 'dd/MM/yyyy', {
+            locale: pt,
+          })
+        : null,
+    }));
+
+    setOrders(data);
   }
 
   useEffect(() => {
@@ -131,11 +147,11 @@ export default function Order() {
                       <strong>Datas</strong>
                       <span>
                         <strong>Retirada:</strong>
-                        {order.start_date || 'PENDENTE'}
+                        {order.start_date_formatted || 'PENDENTE'}
                       </span>
                       <span>
                         <strong>Entrega:</strong>
-                        {order.end_date || 'PENDENTE'}
+                        {order.end_date_formatted || 'PENDENTE'}
                       </span>
                     </DateInfo>
                     <Signature>
