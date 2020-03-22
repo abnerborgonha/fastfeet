@@ -6,7 +6,7 @@ import { Container } from './styles';
 
 export default function Input({ name, ...rest }) {
   const inputRef = useRef(null);
-  const { fieldName, registerField, error } = useField(name);
+  const { fieldName, registerField, defaultValue, error } = useField(name);
 
   useEffect(() => {
     registerField({
@@ -19,7 +19,7 @@ export default function Input({ name, ...rest }) {
   return (
     <>
       <Container>
-        <input ref={inputRef} {...rest} />
+        <input ref={inputRef} defaultValue={defaultValue} {...rest} />
         {error && <span>{error}</span>}
       </Container>
     </>

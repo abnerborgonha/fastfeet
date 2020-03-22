@@ -6,6 +6,7 @@ import {
   MdDelete,
   MdVisibility,
 } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import Modal from '~/components/Modal';
 import history from '~/services/history';
 
@@ -21,18 +22,35 @@ export default function Order() {
   const [orders, setOrders] = useState([]);
   const [product, setProduct] = useState('');
 
+  async function loadOrders(productName) {
+    const response = await api.get(`/orders?q=${productName}`);
+
+    setOrders(response.data);
+  }
+
   useEffect(() => {
-    async function loadOrders() {
-      const response = await api.get(`/orders?q=${product}`);
-
-      setOrders(response.data);
-    }
-
-    loadOrders();
+    loadOrders(product);
   }, [product]);
 
-  function handleNavigate() {
+  function handleNew() {
     history.push('/order/new');
+  }
+
+  function handleEdit(order) {
+    history.push({
+      pathname: '/order/edit',
+      state: { order },
+    });
+  }
+
+  async function handleDelete(id) {
+    try {
+      await api.delete(`/orders/${id}`);
+      loadOrders(product);
+      toast.warn('Encomenda deletada com sucesso');
+    } catch (error) {
+      toast.error(error.response.data.error);
+    }
   }
 
   return (
@@ -48,7 +66,7 @@ export default function Order() {
             onChange={e => setProduct(e.target.value)}
           />
         </div>
-        <button type="button" onClick={handleNavigate}>
+        <button type="button" onClick={handleNew}>
           <div>
             <MdAdd size={22} />
             <span>CADASTRAR</span>
@@ -130,11 +148,21 @@ export default function Order() {
                       )}
                     </Signature>
                   </Modal>
-                  <button type="button">
+                  <button type="button" onClick={() => handleEdit(order)}>
                     <MdEdit color="#4D85EE" size={12} />
                     Editar
                   </button>
-                  <button type="button">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          'Você tem certeza que deseja deletar essa encomenda?'
+                        )
+                      )
+                        handleDelete(order.id);
+                    }}
+                  >
                     <MdDelete color="#DE3B3B" size={12} />
                     Excluir
                   </button>
