@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 import { signOut } from '~/store/modules/auth/actions';
 
@@ -21,10 +21,18 @@ export default function Header() {
       <Content>
         <nav>
           <img src={logo} alt="Fastfeet" />
-          <Link to="/order">ENCOMENDAS</Link>
-          <Link to="/deliveryman">ENTREGADORES</Link>
-          <Link to="/recipient">DESTINATÁRIOS</Link>
-          <Link to="/problem">PROBLEMAS</Link>
+          <NavLink to="/order" activeStyle={{ color: '#444444' }}>
+            ENCOMENDAS
+          </NavLink>
+          <NavLink to="/deliveryman" activeStyle={{ color: '#444444' }}>
+            ENTREGADORES
+          </NavLink>
+          <NavLink to="/recipient" activeStyle={{ color: '#444444' }}>
+            DESTINATÁRIOS
+          </NavLink>
+          <NavLink to="/problem" activeStyle={{ color: '#444444' }}>
+            PROBLEMAS
+          </NavLink>
         </nav>
 
         <aside>
