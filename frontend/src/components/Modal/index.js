@@ -1,30 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-import { MdMoreHoriz } from 'react-icons/md';
+import { Content, StyledPopup } from './styles';
 
-import { Container, Badge, MoreList, More } from './styles';
-
-export default function MoreBtn({ children }) {
-  const [visible, setVisible] = useState(false);
-
-  function handleToggleVisible() {
-    setVisible(!visible);
-  }
-
+export default function Modal({ trigger, children, ...rest }) {
   return (
-    <Container>
-      <Badge onClick={handleToggleVisible}>
-        <MdMoreHoriz color="#666" size={20} />
-      </Badge>
-
-      <MoreList visible={visible}>
-        <More>{children}</More>
-      </MoreList>
-    </Container>
+    <StyledPopup trigger={trigger} modal {...rest}>
+      <Content>{children}</Content>
+    </StyledPopup>
   );
 }
 
-MoreBtn.propTypes = {
+Modal.propTypes = {
+  trigger: PropTypes.element.isRequired,
   children: PropTypes.element.isRequired,
 };

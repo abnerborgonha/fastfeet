@@ -77,30 +77,60 @@ export const Container = styled.div`
   }
 `;
 
-export const Content = styled.table`
-  width: 100%;
-  border-spacing: 0 20px;
+export const RecipientInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  border-bottom: 1px solid #ccc;
 
-  thead th {
-    color: #333;
-    text-align: left;
-    font-size: 16px;
-    padding: 5px 10px;
+  strong {
+    font-size: 14px;
+    margin: 8px 0;
   }
 
-  tbody td {
-      background: #fff;
-      padding: 5px 10px;
+  span {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+`;
 
-      &:first-child {
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
-      }
+export const DateInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  border-bottom: 1px solid #ccc;
 
-      &:last-child {
-        border-bottom-right-radius: 4px;
-        border-top-right-radius: 4px;
-      }
+  strong {
+    font-size: 14px;
+    margin: 8px 0;
+  }
+
+  span {
+    font-size: 15px;
+    margin-bottom: 8px;
+
+    strong {
+      margin-right: 5px;
     }
+  }
+`;
+
+export const Signature = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  strong {
+    font-size: 14px;
+    margin: 8px 0;
+  }
+
+  img {
+    align-self: center;
+    width: 220px;
+    height: 80px;
   }
 `;
