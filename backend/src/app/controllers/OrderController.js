@@ -9,14 +9,9 @@ import Mail from '../../lib/Mail';
 
 class OrderController {
   async index(req, res) {
-    let { q: name = '%' } = req.query;
+    const { q: productName, page = 1 } = req.query;
 
-    if (name === '') {
-      name = '%';
-    }
-
-    const orders = await Order.findAll({
-      where: { product: { [Op.like]: name } },
+    const findOptions = {
       order: [['id', 'ASC']],
       attributes: [
         'id',
@@ -62,7 +57,18 @@ class OrderController {
           attributes: ['name', 'path', 'url'],
         },
       ],
-    });
+    };
+
+    const orders = productName
+      ? await Order.findAll({
+          where: { product: { [Op.like]: productName } },
+          ...findOptions,
+        })
+      : await Order.findAll({
+          limit: 5,
+          offset: (page - 1) * 5,
+          ...findOptions,
+        });
 
     return res.json(orders);
   }
